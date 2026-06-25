@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+
+# OCR/extracted page images and bulky intermediate data
+pab_s*_pages/
+pab_s*_pages_probe/
+pab-s*-ocr-words.json
+
+# Local run stats
+pab_exam_stats.json
+
+# Local PDFs are not needed by the trainer
+*.pdf

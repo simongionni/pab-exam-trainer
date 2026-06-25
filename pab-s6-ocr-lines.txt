@@ -1,0 +1,654 @@
+===== PAGE 01 =====
+Question 1 of 65
+Choose option.
+DreamHouse Realty (DA) asks tor some improvements in case They want to enforce prxess compliance so
+cases are unable to be reverted to an cartier case status, and to ensute that certoin fields are required when specific case criteria
+are met.
+Whicn solution should an app builder implement to meet these requirements?
+A Configure validation n.nes with help ten
+B. Create dependent picklist nescis and set them as required.
+C. Make the nelds requirea on the page Iamm
+O O. use an approval process to check nel' criteria are met.
+Question 2 of 65
+Ch00* option.
+Orsa Maior Sotar wants to provide sales console users with an incredible experience. with the most-used components easity
+accessiNe at all times.
+Which can enable reps to and these components from anywhere within the app without 'coving the
+where team is workirv
+A. 'Rility bar
+B. Home page
+C. GIObal actions
+
+===== PAGE 02 =====
+Question 3 of 65
+Choose 2 options.
+DreamHouse Realty (DA) is expanding into subsidized housing by pattnering with local governrnent entities. OR tses Cloud
+and has enabled field history tracking on the Opportunity ot*ct. Due to increased inforrnation requirernents, the App team is
+changing Text Area (Long) nelas to Rich Text nelds to allow tor up to 1,000 char.cters and better descriptions.
+Which two considerations should be nude t»• the team?
+A. Field History Tracking records value changes of 2SS char•cters or
+a B. Rich text netd values ot all tengths are displayed in reports.
+C. Data IOS occurwt.en charging custom netd types.
+a O.Audit through API extracts.
+Question 4 of 65
+Choose option.
+Orsa Major Solar is camping up the sales team to nvet increased demand. As part of the short ramp up tot these new reps. the
+manager wants to ryovide a help guide to emble reps to easily get help where needed during the different sales processes.
+Which should an app builder recommend?
+A. Chatter
+B. Path
+
+===== PAGE 03 =====
+Question 5 of 65
+Choose option.
+app builder has a custom component they want to make available on the utility bar. but the component is unavanable.
+How should the component be tagged?
+A. For use on the utility bar.
+B. For use on record
+C. For use in Lightning App Builder.
+O O. For use in App
+Question 6 of 65
+Choose 3 options-
+Cloud KiCkS wants to set up a new opportunity approval process and execute various action items based on the initial submission.
+WhiCh three action types Should an app builder use in the approval process?
+A. Erroi' Alert
+a B. rask
+C. Invocabie How
+D. Decision Oement
+E. Outbou•nd Message
+
+===== PAGE 04 =====
+Question 7 of 65
+Choose 2 optòns.
+Sales Managers want to be automaticalty noti6ed any time there is a change to an Opportunity Close Date and want these changes
+to be tracked on the Opportunity
+Which two configurations should an app builder recommend?
+A. E.ruble Feed Tracking on Opportunities.
+B. Create an Opportunity outbound
+C. a record•tr.ered flow on Opportunity and a Chatter post
+0. Activate Historicol Trending for Opportunities.
+Question 8 of 65
+Choose option.
+Anappbuilderiscreating acustomobject caned Testinoniai with boththe
+and Account record. (f the Account is deleted, the c bedeleted. If
+the Contact isoeleted, but the Account remains. the e recorassnould remain.
+How should this be accornplisned?
+A. Create a master.oetail relationshiptrom ctoAccount anda lookup relationshipfrom
+Test inonial c
+B. Make botti the Contact and Account required on the T"tinonial c Obiect and create lookup
+retationst"ips from to ana to Rcourtt.
+C. Create a 100kup relationship e and a master•detail relationship
+Tee t inonial e toContact.
+O O. Make a junction Object between Account and Contact using master.detail relationships.
+
+===== PAGE 05 =====
+Question 9 Of 65
+Choose 2 options-
+Northern Trail Outfitters (NYO) has created the custom objects Trail and Park in Salesforce to track traits and parts respectively
+NTO wants to track the total nurnber of trails a park has on the park without writing any
+Which two actions should an app builder take to accompEsh this requirement?
+Cl A. use a rnaster-detaa relationship between the Park and Trail obiects.
+B. a lookup between the Park and Trail
+C. use a roll•up summary field on the record to show the total number Of
+O. a formula on the record to show the total number Of trails.
+Question 10 of 65
+Choose option.
+Universal Containers wants to ensure that they are csean data trom theif users and •v-*fity that important ne•cis are
+W*vt should on app builder recornmend to meet this requiremcnt?
+A. Configure a validation to require a field a specific record type.
+B. Create a Flow to clean any data that is formatted wrong.
+C. Make a formula field to check the of the important
+D. Update the important field* to be required on the page layout.
+
+===== PAGE 06 =====
+Question 11 of 65
+Choose 1 option.
+A new fidd is being created on a custom otàect However. app builder does not want the ne4d to show up pre-existing
+ca$tom report types.
+What should the app builder do on the custom setup to futfil'l this requirement?
+A. Deselect auto odd to custom report type.
+B. the new field from au layouts.
+C. visibility to report
+C) O. Grant reod-only to 011 report
+Question 12 of 65
+Choose option.
+Universal Containers has deployed custom tabi to production '"a change sets. without including the profile settings or permission
+What is the setting for the visibility of custom tabs?
+A. astorn tabs ate defauft on for au users.
+B. tabs are hidden for all
+C. C.ntom tabs are NOT
+D. tabs are default Off users.
+
+===== PAGE 07 =====
+Question 13 of 65
+Choose option.
+Universal Containers wants users to have access to the pricing guidelines document wnen viewing a Contract related to an
+Which feature should an app builder use to create easy access to the document?
+A. A custom detail page link on the Contr•ct obiect
+B. Action on the Contracts Object
+C. A custom detail page on the Account Object
+C) O. Action 00 the Account
+Question 14 of 65
+Choose option.
+What are the limitations of Scherna Builder when a custom obiect?
+A. Swe•• should be cficked eoch time a new Object. field. or relationship is created.
+B. Relationships can be m.de to any custoen Objects. but arti relationships to standard Objects Should be buiR
+Lightning Object Manager.
+C. fields and relationships can be created, but they win be unab'e to add the 6ekis to the page layout 'rom the
+D. Custom neldS can be acided to arv custom Objects, excluding formula neu types.
+
+===== PAGE 08 =====
+Question 15 of 65
+Choose 1 option.
+Cloud Kicks (CK) wants to quickty insert a list of over i net new Accounts. The template based on CKS data model was
+used to populate the tat.
+Which tool should be used?
+A. Irnport Wtzard
+B. Loader
+O O. Lghtning Object
+Question 16 of 65
+Choose optòn.
+Cloud Kicks wants to display 12 key fields at once in a separate section at the top of opportunity records on the desktop.
+Which component should an app builder add to the record page to enable th' tunctionaüty?
+A. Highlights Panel
+B. Path
+C. Custom Lightnirg Web Component
+D. Accordion
+
+===== PAGE 09 =====
+Question 17 of 65
+Choose option.
+The director is concerned too many car parts giwn away tor free last year. they want to track discounts,
+sarn*s, and giv•eawap by Sales Rep. The managers sign-off on free parts Olso needs to be ryocessed.
+Which functionaEty should an app builder use to meet these requirements?
+A. Quotes
+B. Check
+C. Velocity Sales
+O. Approval process
+Question 18 of 65
+Choose option.
+A Cloud KiCkS emp•oyee submitted an opportunity tor by theif nunager.
+What wal happen if the employee attempts to edit the description netd arter submission?
+A. User will see the record is now owned by their manager.
+B. user wilt be presented with a Lock' notification.
+C. User wül be to edit the name, but unable to edit the descri$*ion.
+D. w/' be able to edit the description field only.
+
+===== PAGE 10 =====
+Question 19 of 65
+Choose 1
+Universal Containers has a single Contact Lightnir•g record page. A cotnponent takes up a Iot ot room on the page and is NOT
+needed by users with a pe061e.
+What should the app builder use to this issue?
+A. Detail paF Iqouts
+B. security
+C. Component filter
+O O. AppExchonge
+Question 20 of 65
+Choose 3
+Due to the complexity of the Universal Containers sandbox release schedule and requirements. it is advised that charve sets are
+used often os possible to from one to another.
+Which three common items can an app buader move when using a set?
+A. Apex class
+B. Web-to•lead
+C. Standard fields
+O. field
+E. Custom
+
+===== PAGE 11 =====
+Question 21 of 65
+Choose option.
+Cloud Kicks is redenning its entire business process to the Manager Notes Beki from a long text area field The goal is to
+managers to be more concise in their comments and stay at 255 characters or Jess. There is inforrnation in
+the Manager Notes netd that otten is well beyond the character lirnit.
+What would happen to existiru information if the app builder tries to convert a pteexisting long text atea neld to text area?
+A. Preexisting information in the field WiM be completely Iost-
+B. information wül cause an error message to pop up.
+C. Preexisting information will remain even it it was wer 25S characters.
+D. *eexistirg information will truncate to the nrst 255 characters.
+Question 22 of 65
+Choose optòn.
+app builder needs a custorn solution and is considering using either AppExcnange or their local developer community. the app
+builder wants to minirnir the nerd for manual rnaintenance.
+W*vt should the opp builder consider?
+A. A managed package from AppExchange
+B. An opensource custom developrnent
+C. smrnamged pockaF from AppExctwt•F
+D. An open•source package
+
+===== PAGE 12 =====
+Question 23 of 65
+Choose 1 option.
+A custom field on an account is u.sed to track finance information about a custorner. Oney members of the mance team hae
+access to this field. However, the business wants to albw one C&$tomer service is assigned the Customer Service
+proNe, read-oney access to this neld tot special circumstances.
+is the recommended solution to grant the custorner service agent access to the neld?
+O A Update the custom field' field level security in setup to allow read.only access to the field.
+B. Create a new pronte to allowfor read-onb• access to the field field levet security and assign it to the
+C. Create a permission set that read-on»• access to the netd via netd levet security and assign it to the
+O O. update the Customer Service Pronle already assigned to the agent to atsow for read-onty access to the nel' via
+field leve' security.
+Question 24 of 65
+Choose
+Cloud Kicks wants to rnake sure that users without the Marketing role are unable to update the Contact Retail Opt tn pickiist
+field to Yes.
+Which validation rule should an app builder to prm•ent other users from making this
+B. ARO( In c )
+C. pog : tn c,
+•yarketina•, In c),
+
+===== PAGE 13 =====
+Question 25 of 65
+Choose option.
+Universal Containers expects impacts to operations due to increased demand. The executive team wiE re•ch out to current
+c&$tomers and wants to see the number of open cases for account and parent account.
+What should an app builder use to display number of open cases on the account page?
+A. Flow
+B. Object
+C) O. Approval
+Question 26 of 65
+Choose option.
+Orsa Maior Solar wants to automate a welcome email to new clients ana include a customized survey about their buyü"g
+experience. An app builder is tasked with this prqect and has very little time to build the M'luticyt from scratch, but still needs to
+be able to tu*y customize the solution.
+What Should the app buildet dO to meet the deadline ana custom requirements?
+O A Choose an unmanaged package trom AppE.xchange that closeey meets the requirements ot the project and
+programrnatic developrtW'1t.
+B. a rnanaged package from AppExchange that closety meets the requirernents of the proiect, restricts
+programrnatic development. but allom declarative developrnent.
+C. Work with a developer to create custom Apex code and a Lightning web component survey to meet the criteria.
+O. sasesrotce now to build the survey declarati•Ny to meet the criteria and send it to the customer as an email.
+
+===== PAGE 14 =====
+Question 27 of 65
+Choose 3 optòns.
+Cloud Kicks has a sdes rep who is stating that their Contact is unavailaue tor othet users to see within Salesforce.
+tn whiCh three ways can an app builder troubIeshOOt this 'sue?
+A. Verify the with the issue access to the Contact Object.
+B. Review the Contact record and ensure it is linked to an Account.
+a C. Create a new Contact and haw the users try ag.in.
+O. Create an Account Sharing Rule to giv•e the users access to an records.
+E. Connrm whethef Default Organization•Wide Sharirg Settirgs pm•ide access to the
+Question 28 of 65
+Choose
+Universal Containers has the Account object•s Organization.Wide Default set to *ivate. The marketing team owns Rcoums;
+they also need to be able to see the sales teams Accounts. Both the sales and nureeting teams are in cornpletely
+different txaocnes ot the hietarcny.
+Which feature should be used to enable marketing to see sales-owned acoounts?
+A. Assignment rules
+B. Sharing rules
+C. Public groups
+O O. Aliases
+
+===== PAGE 15 =====
+Question 29 of 65
+Choose 2 options-
+Dream House Realty wants to irnport its property records trom an extemal system into Salesforce. The app bui&der Will use an
+external field to house the property (D from the external sptern.
+Which two details should the app builder know •ù'•en external ID fields?
+A. An external IO field can be an auto-number field.
+B. Each can have up to 25 custom external fields.
+C. Ench Object can hove up to 25 custom external IO
+O. An external can be a
+Question 30 of 65
+Choose option.
+The VP of Sales at Universal Containers has asked the app buikier to let sales reps create opportunity records directty trom the
+account. with a number of felds pre•populated.
+Which feature should the app builder usc to to create the opportunity?
+A. astorn link
+B. action
+C. C'Otom button
+O. QJick action
+
+===== PAGE 16 =====
+Question 31 of 65
+Choose 3 options
+Universal Containers an emplwees to submit tor leadership using a custom Object called Review. These Reviews
+should onty be visible to the HR department and the employee who subrnitted record.
+Which three steps should an app take to property control access to Reviews?
+A. Remwe Read permission from non•HR Department
+B. Oisable Grant kcess Using
+C. a field on the Review
+0. Set organizotion•wide default to
+E. Create a criterio based Sharing for the HR Deportrncnt.
+Question 32 of 65
+Choose optòn.
+Sales reps at Cloud Kicks (CK) torget to subrnit for approval when CK needs otders before close won. CK wants to
+autorrvtkauy submit oppcytunities into the Secure Commitment Stage to eliminate manual subrnission.
+Which feature meets the business requirements?
+A. Record•Tr.ered now optimird Fast Field Updates
+B. button and screen new
+O. optirnized for Actions and Related Records
+
+===== PAGE 17 =====
+Question 33 of 65
+Choose option.
+Orsa Maior Solar (UMS) has a Object where they track Galactic Vendors. The Object has tour custom fields tot the
+Galactic Vendors's location:
+• Street
+• City
+• Planet (Ranet„c)
+• Galaxy (Galaxy_c)
+The UMSs leadership wants these fie&ds to be combined into sin* formula feld on two lirws.
+Which formula tuttas this requirement?
+e ERO
+City c " Plana: e Caiaxy
+B. Stroot c
+City c. Planet e Galaxy e
+C. Street e,
+City c & Planet c Galaxy
+Question 34 of 65
+Choose option.
+Cloud KiCkS wants to disptay the number of Opportunity recoros associated with och Account.
+WhiCh soaution Should be
+A. Formula feld
+B. Roll-up summary field
+C. offering
+D. LOOkup neld
+
+===== PAGE 18 =====
+Question 35 of 65
+Choose 2 options.
+Universal Containers (tJC) wants to data in severa' fields for S.OOO Lead records. UC exported the selected Record IOS and
+fields that nerd to have data in a CSV file.
+Which two steps shouki on app builder suggest to meet these requirements?
+A. Select Insert Null Values in Settino.
+B. Import Wizard to update using the CSV
+C. Sekct the correct record type.
+0. Dato Loader to update using the CSV
+Question 36 of 65
+Choose optòn.
+A user is unable to use inline editing on a list view. A quick check the user should be able to perform infine editing as they
+ha.•e been assigned the appropriate perrnissions.
+Which condition shouki the app buòder review?
+A. If the list View restricts sharing user
+B. If the list View contains a chart created by the
+C. (f the list View selected is locked 9• another user
+C) O. If the contains more than one record type
+
+===== PAGE 19 =====
+Question 37 of 65
+Choose option.
+Managers at Universal Containers want a quick way to create additional accounts to torm a hierarchy from a Parent Account
+record. Tt*Y want to auto-populate fie&ds based on parent to make it casier for users to create the Child accounts qukkty.
+What should the app builder recornmend?
+A. astornize a Global Quick Action
+B. Create a custom action
+C. a custom Enk on Account
+C) O. Add Path on Account hierarctv
+Question 38 of 65
+Choose option.
+Cloud KiCkS (CK) wants to track ordets against irrventory. ensuring its ability to tuttll order requests. CK created a junction Object
+to emble telationships with the Irwentory and Order
+W*vt does the app builder need to rmvide to ensure can View Request Insentory records?
+A. Sharing rules on Request Irventory obiect.
+B. Read access to the first rnaster Object.
+C. sharing on the first rnaster obiect.
+D. access to both master objects.
+
+===== PAGE 20 =====
+Question 39 of 65
+Choose optòn.
+When an opportunity has a closed date that is pushed more than 30 days. approval is required. An approval process is in
+place reps frequently forget to subrnit for apprrwal to run the process.
+How con an app buacier ensure that these opportunities are subrnitted into the approval process?
+A. Give the manager •APt permission to permit appro•al responses by ernail.
+B. a rule and an email alert to the rnanaFt requesting awoval.
+C. S'brna the record for approval on automated process.
+O O. ChanŒ the entry criterio on the approval process to criterio ore met and lock the record on initiol sutynission.
+Question 40 of 65
+Choose
+Service Agents are required to confirm a users identity before providirg support intorrnation the phone.
+Whicn feature can an app builder to help meet this requirement?
+A. Incluoe Surveys as a Case related list
+B. Case Validation Rules
+C. Guided Action Flows on the record
+D. Add Pathto the top of the Case Saput
+
+===== PAGE 21 =====
+Question 41 of 65
+Choose 1 option.
+Attee ut/izing the Lightning Object Creator to create a new Object. its 6eSds, and to insert alt ot the data. an app builder needs
+to set up the Lightning Record Page.
+Which component should the app ha•.e on their LÉhtning Record Page to all of the felds ftoro the page
+A. Path
+C. *'lights Panel
+Question 42 of 65
+Choose option.
+Universal Containers neeos the 18-digit record to trom Opportunity records wnen exporting data to Excel in oraer to ensure each
+record tteated uniquely.
+Which Should on opp builder use to create this new field?
+
+===== PAGE 22 =====
+Question 43 of 65
+Choose 2 options.
+Universal Containers (UC) has brge data volumes and is nearing data storage limits. The planned solution is to archive historical
+data to reduce data in Salesforce; UC would still like to use reports, queries, and lookups on the archived
+information.
+Vû'ich two options could meet this requirement?
+A. Big obiects
+B. External Objects
+a C. Related Obiects
+a O. Custom Objects
+Question 44 of 65
+Choose optòn.
+Ursa Major Solars service department gets requests for sewral types of services, such as imtanation. repair. and roaintenance.
+Service managers need to be able to teu when maintenance was last done on an asset to help determine if they are meeting
+contract agreements. but tne last roaintenance date can be dimcutt to determine when there are many work orders related ro the
+asset. They think it would be helpful to a field auto•populated on the Asset record when a maintenance order gets
+Which tool Should an app recommend to help meet th' tequitement?
+A. Apex Trigger
+C. Surnmary
+O O. Next Best Action
+
+===== PAGE 23 =====
+Question 45 of 65
+Choose option.
+app builder installed a custom Lghtning component from AppExchange.
+What snould be done next in orcser to configure the component tor use in a record page?
+A. a record page using the Page Layout editor the component onto the page.
+B. EŒt a record page using App Manager Drag the component onto the page.
+C. Edit a record page using Lightning App Builder » Drag the component onto the page.
+D. Edit a record page using the Page editor Drag the Visuatfo«e component onto the page.
+Question 46 of 65
+Choose option.
+Cloud KiCkS wants to know the total value of au won Opportunities tor Accounts and display it on the reco«d.
+WhiCh type of summary Should the app builder use in the '011-up summary nel'?
+A. Sum
+B. Aggregate
+C. rotal
+O O. Count
+
+===== PAGE 24 =====
+Question 47 of 65
+Choose option.
+An app builder at Northern Trail Outfitters created a sandbox template tot Accounts. *ojects. and *oject Milestones to
+some for the prqect app.
+Which ty•pe of testing emironment should the app builder create?
+A. Developer Pro
+B. Partiat Cow
+O O. Scratch
+Question 48 of 65
+Choose 2 optòns.
+The Director of Customer Service wants to recei.•e a ooti6cation when a case stays in the new status tot more than tour business
+Which two autoroation processes should be used to accomplish this?
+A. Validation Rule
+B. Escalation tules
+C. Scheduled Apex
+O. Flow Budder
+
+===== PAGE 25 =====
+Question 49 of 65
+Choose option.
+DreamHouse Realty is rethinking its sandbox utilization strateo atter acquiring Goud Kicks. The S8•estorce COE alre•dy utilizes a
+partiat and a full sandbox, wttich it refreshes on their own regular schedules. Teams ate expanding hase to begin eoch of their
+small in a sandbox berore committing to the large' pool tor cogaborative testing while sti" keeping costs dewn.
+Whicn sandbox type should be considered nrst?
+A. Developer pro sandbox
+B. Fua sandbox
+C. Pattial sandbox
+o. sandbox
+Question 50 of 65
+Ch00* option.
+The app buiiderat Orsa Major Solar createdamaster-detailrelationship between a parentot*ect Galaxy cand childObiect
+Star C.
+Wtvt is the of creatine this typcof wont to report on Galaxy c with Star c?
+A. A Galaxy c with c report type win be autorrutically created.
+B. A c type with c asa field will be autornaticaUy created.
+C. A new custom report type need to be created c with lookup frorn Galaxy C.
+O. A new report type need to be created for Galaxy c with c.
+
+===== PAGE 26 =====
+Question 51 of 65
+Choose 1 optòn.
+Universal Containers wants to create a custom checkbox formula field on the Opportunity obiect. This formula should evaluate to
+true if the
+• Stage isset to Negotiationtgevie•w
+• Close Oate is less than week away
+Which formula mects these requirements?
+- < TOOAYO )
+B. xvoqseaaeuame •x.qotiationn.vieu•, - < TONY O
+O - < TOOkYO
+O O. - < TOOhYO
+Question 52 of 65
+Choose 1 optòn.
+Universal Containers is setting up Salesforce for the first time. Management wants the sales and marketing teams to haw different
+menus in the Salesforce Mobde App.
+Which option is wailable to an app builder to satis9 this requirement?
+A. Create roles for sales and marketing and assign a custom homepage layout esch roie-
+B. Create mobile navigation menus for both sales and marketing
+C. Create and marketing apps and the respective to each app.
+C) O. Create groups for and marketing and create navigation menus for cach
+
+===== PAGE 27 =====
+Question 53 of 65
+Choose option.
+At Ursa Maior Solar. there is a single Lghtning record page for the Celestial Bodies custom ot*ect: however. ttwe is a Lightning
+the app builder wants to restrict to mobile app users.
+Which feature in the Lightning app builder should be utilized?
+A. Highlights panel
+B. Form factor
+C. Related list quick links
+O. Component visibility filter
+Question 54 of 65
+Choose 2 options-
+WhiCh two report formats can be used as a source report to configure a reporting snapshot?
+A. Tabular forrnat
+B. Matrix format
+C. Sumrnary fo«mat
+O. ;oined forrnat
+
+===== PAGE 28 =====
+Question 55 of 65
+Choose 1 option.
+Cloud Kicks conducts an evaluation of sales reps with a custom Object fiat houses a scorecard.
+The compar»• wants to ensute that onty the sales reps. their and their maruger•s executives can View the reps
+scorecard, but Olso prevrnt the reps from being able to •.ie•et the executive comment fields on their review.
+How should thesc requiremcnts be rmt?
+A. o model gronting record using hierarchy; monase field with
+B. a private sharing model granting record using custom settings; rnanage feld access with page layouts
+ana wcurity
+C. use a private sharing model granting record acceS using settings; manage netd access with record types
+and page
+D. o private sharing model granting record access using hicrarch•; field access with record types and
+neld•level security
+Question 56 of 65
+Choose optòn.
+Sales reps at Universal Containers create multiple quotes per opportunity.
+Whicn automatioo tool snould an app builder recommend to delete rejected quotes?
+A. Validation rule
+B. Einstein Next Best Action
+C. process
+D. Flow
+
+===== PAGE 29 =====
+Question 57 of 65
+Choose 2 options-
+Cloud Kicks (CK) switched to Liûtning Experience and started using Chatter across its global workfo«e to support its fast•paced
+sales CX loves Chatter but str•e with gathering feedback ftoro core team members, including understanding who is
+availàbte to respond.
+Which two could CK use Chatter to this problem?
+a A. Topics
+a B. Streams
+o. Outotomce
+Question 58 of 65
+Choose option.
+DreamHouse Realty (DR) emplqees started using company-owned airptanes tor wotk tra•el atter ursa Maiot Solar was acquired.
+DR executi•.es want to autorrvte the submission travel request forms to enforce the internal policy.
+How should on opp buikicr automote travel requests based on these criterio?
+A. Validation
+B. Assignrnent rule
+C. Apprmal process
+O O. Apex
+
+===== PAGE 30 =====
+Question 59 of 65
+Choose 1 option.
+Universal Containers wants to collaborate wah its customers 'Sithin Salestorce and has decided to enable the AISow Customer
+Invitations in the Chatter
+Which is granted to customers when invited to a Ctvt'ter group?
+A. ability to imite members to groups of whic:h they are a rt*rnber.
+B. The ability to interact with members Of their groups.
+C. Otility to@mention accounts Of which they a contact.
+O O. The ability to request to public groups.
+Question 60 of 65
+Choose 1 optòn.
+Universal Containers created a castom obiect caned Component to capture details about products sold.
+Whicn approach shouki an app builder take to show component as a related list on Product?
+A. Create a master.oetail relationship on Product to Component Add the Component related list to the Èoduct
+pate layout.
+B. Create a lookup relationship on Cornponent to Product. Add the Cornponent telated list to the Product
+C. Create a roll-up on Product. Add the Component related list to the Product page Iaput-
+O O. Create a junction obiect to relate component Product. Add the Component related list to the Product
+
+===== PAGE 31 =====
+Question 61 of 65
+Choose 1 option.
+Universal Containers (UC) wants to test code against a subset of production data that is urxier S GB. Additionany. OC wants to
+tefresh this sandbox every weekend.
+Which Of sandbox should be used to accomplish this?
+A. Partial
+B. Copy
+C. Developer
+Question 62 of 65
+Ch00* option.
+AW Computing has a Object tot service plans.
+A service ptan neeas to be associated to one and onb• one contact. The support manager noticed if the wrong contact is
+associated, the reps are to change the contoct. The app builder olreody confirmed the user to the feld
+and there are no validations associate' with the service puns.
+What could bè causing the issue?
+A. Allo•w reparenting Checkbox. Child records can be reparented to Other parent records amer they are created, is
+B. The Rcad/Writc radio button. AUOM users with at Icast Rc.dIWritc access to the Master record to create, or
+delete relatea Detail recotds, is selected.
+C. The Allow reparenting checkbOX, Child tecotds can be reparented to Other patent records aner tttey are created, is
+checked.
+D. The Reed Only radio botton. Anows users with at least «cess to the Master record to create. edit. or delete
+re&ted Detail records, is selected.
+
+===== PAGE 32 =====
+Question 63 of 65
+Choose 1 optòn.
+Universal Containers (UC) tracks Account locations in Zip Code. a text field with a validation rule to enforce proper
+forrtvtting of the US ZIP•4 code UC's orders.
+Which formula Should the app builder create on Order to onty the first frve digits of Zip Code from the parent kcount?
+A. TEXT(Xccouae.Zip cod. c, S)
+C. cod. r, S)
+Question 64 of 65
+Choose
+The app buikier at AW Computing has been asked to track the number of tirnes a case has been reopened.
+Which solution should the app builder utili* to help with this request?
+A. Apex Trigger
+B. Recoro-triggered flow
+C. Scheduled triggered flow
+D. Screen Flow
+
+===== PAGE 33 =====
+Question 65 of 65
+Choose option.
+A new netd "-sas been •dded to the Applicant Object that is part ot an unmanaged package. A recruiter ran the Position wit' or
+without AppEcants report and noticed that the new field was missing as an option to add as a column.
+Ho•vv should an app troubleshoot this issue?
+A. Adjust the feld level security to incltxie in the report type.
+B. Check Allow Reports for the position and applicant
+C. Update the profile with the R'blic Reports perrnission.
+O. Add the field to the custom report type
