@@ -8,6 +8,16 @@ pab-s*-ocr-words.json
 
 # Local run stats
 pab_exam_stats.json
+pab_exam_session.json
 
 # Local PDFs are not needed by the trainer
 *.pdf
+
+# Android build output
+.gradle-local/
+gradle-*-bin.zip
+android_app/.gradle/
+android_app/build/
+android_app/app/build/
+android_app/local.properties
+android_app/gradle.properties

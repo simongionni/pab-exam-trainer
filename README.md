@@ -7,6 +7,8 @@ Small local trainer for Salesforce Platform App Builder practice questions.
 - `pab_exam_trainer.py`: GUI quiz app.
 - `pab-s1-quiz.xlsx`: question bank used by the app.
 - `avvia_pab_exam_trainer.bat`: Windows launcher.
+- `android_app/`: Android Studio project for the mobile trainer.
+- `export_android_questions.py`: exports the Excel question bank to Android JSON.
 - `build_pab_quiz.py`: script used to rebuild the workbook from PDF/OCR sources.
 - OCR text files used during the extraction process.
 
@@ -40,3 +42,30 @@ avvia_pab_exam_trainer.bat
 - Includes a GUI button to reset counters.
 
 `pab_exam_stats.json` is intentionally ignored by Git so every device keeps its own progress.
+
+## Android App
+
+The Android app uses the same questions and the same training logic:
+
+- 65-question sessions.
+- Balanced question extraction based on local counters.
+- Randomized answer order.
+- Immediate feedback after each question.
+- Selection limited to the number of correct answers.
+- Local resettable counters on the phone.
+
+To refresh the app question bank after changing `pab-s1-quiz.xlsx`, run:
+
+```powershell
+python export_android_questions.py
+```
+
+To build/install it:
+
+1. Install Android Studio.
+2. Open the `android_app` folder in Android Studio.
+3. Let Android Studio install/sync the required Android SDK and Gradle plugin.
+4. Connect an Android phone with USB debugging enabled, or start an emulator.
+5. Press Run in Android Studio.
+
+To create an APK in Android Studio, use `Build > Build Bundle(s) / APK(s) > Build APK(s)`.

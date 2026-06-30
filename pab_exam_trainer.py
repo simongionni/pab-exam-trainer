@@ -2,6 +2,9 @@ import json
 import random
 import re
 import tkinter as tk
+import urllib.error
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from tkinter import messagebox, ttk
@@ -12,7 +15,10 @@ from openpyxl import load_workbook
 ROOT = Path(__file__).resolve().parent
 WORKBOOK_PATH = ROOT / "pab-s1-quiz.xlsx"
 STATS_PATH = ROOT / "pab_exam_stats.json"
+SESSION_PATH = ROOT / "pab_exam_session.json"
 SESSION_SIZE = 65
+SUPABASE_URL = "https://haorkjzxxhzpcvmvaklk.supabase.co"
+SUPABASE_ANON_KEY = "sb_publishable_ljBw3GVH83nOhfVB-uXF2g_vek6Ev4C"
 
 
 @dataclass
@@ -23,6 +29,206 @@ class Question:
     prompt: str
     options: list[tuple[str, str]]
     correct_letters: set[str]
+
+
+class SupabaseError(RuntimeError):
+    pass
+
+
+class SupabaseClient:
+    def __init__(self, url: str, anon_key: str) -> None:
+        self.url = url.rstrip("/")
+        self.anon_key = anon_key
+        self.access_token = ""
+        self.refresh_token = ""
+        self.user_id = ""
+        self.email = ""
+
+    @property
+    def online(self) -> bool:
+        return bool(self.access_token and self.user_id)
+
+    def load_saved_session(self) -> bool:
+        if not SESSION_PATH.exists():
+            return False
+        try:
+            data = json.loads(SESSION_PATH.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            return False
+        self.access_token = data.get("access_token", "")
+        self.refresh_token = data.get("refresh_token", "")
+        self.user_id = data.get("user_id", "")
+        self.email = data.get("email", "")
+        return bool(self.access_token and self.refresh_token)
+
+    def save_session(self) -> None:
+        SESSION_PATH.write_text(
+            json.dumps(
+                {
+                    "access_token": self.access_token,
+                    "refresh_token": self.refresh_token,
+                    "user_id": self.user_id,
+                    "email": self.email,
+                },
+                indent=2,
+            ),
+            encoding="utf-8",
+        )
+
+    def clear_session(self) -> None:
+        self.access_token = ""
+        self.refresh_token = ""
+        self.user_id = ""
+        self.email = ""
+        if SESSION_PATH.exists():
+            SESSION_PATH.unlink()
+
+    def sign_in(self, email: str, password: str) -> None:
+        data = self._request(
+            "POST",
+            "/auth/v1/token?grant_type=password",
+            payload={"email": email, "password": password},
+            auth=False,
+        )
+        self._apply_auth_response(data)
+
+    def refresh_session(self) -> None:
+        if not self.refresh_token:
+            raise SupabaseError("Sessione Supabase mancante.")
+        data = self._request(
+            "POST",
+            "/auth/v1/token?grant_type=refresh_token",
+            payload={"refresh_token": self.refresh_token},
+            auth=False,
+        )
+        self._apply_auth_response(data)
+
+    def fetch_questions(self) -> list[Question]:
+        rows = self._request(
+            "GET",
+            "/rest/v1/questions?"
+            + urllib.parse.urlencode(
+                {
+                    "select": "id,source,original_number,prompt,options,correct_letters",
+                    "order": "id.asc",
+                }
+            ),
+        )
+        questions = []
+        for row in rows:
+            options = [
+                (str(option.get("letter", "")), str(option.get("text", "")))
+                for option in row.get("options", [])
+            ]
+            correct = {str(letter) for letter in row.get("correct_letters", [])}
+            if row.get("prompt") and options and correct:
+                questions.append(
+                    Question(
+                        qid=str(row["id"]),
+                        source=str(row.get("source") or ""),
+                        original_num=str(row.get("original_number") or ""),
+                        prompt=str(row["prompt"]),
+                        options=options,
+                        correct_letters=correct,
+                    )
+                )
+        return questions
+
+    def fetch_stats(self) -> dict:
+        rows = self._request(
+            "GET",
+            "/rest/v1/question_stats?"
+            + urllib.parse.urlencode(
+                {
+                    "select": "question_id,seen,correct,wrong",
+                    "user_id": f"eq.{self.user_id}",
+                }
+            ),
+        )
+        return {
+            "questions": {
+                str(row["question_id"]): {
+                    "seen": int(row.get("seen") or 0),
+                    "correct": int(row.get("correct") or 0),
+                    "wrong": int(row.get("wrong") or 0),
+                }
+                for row in rows
+            }
+        }
+
+    def upsert_stat(self, qid: str, values: dict) -> None:
+        self.upsert_stats({qid: values})
+
+    def upsert_stats(self, question_values: dict) -> None:
+        if not question_values:
+            return
+        payload = [
+            {
+                "user_id": self.user_id,
+                "question_id": qid,
+                "seen": int(values.get("seen", 0)),
+                "correct": int(values.get("correct", 0)),
+                "wrong": int(values.get("wrong", 0)),
+            }
+            for qid, values in question_values.items()
+        ]
+        self._request(
+            "POST",
+            "/rest/v1/question_stats?on_conflict=user_id,question_id",
+            payload=payload,
+            prefer="resolution=merge-duplicates,return=minimal",
+            expect_json=False,
+        )
+
+    def _apply_auth_response(self, data: dict) -> None:
+        user = data.get("user") or {}
+        self.access_token = data.get("access_token", "")
+        self.refresh_token = data.get("refresh_token", self.refresh_token)
+        self.user_id = user.get("id", self.user_id)
+        self.email = user.get("email", self.email)
+        if not self.access_token or not self.user_id:
+            raise SupabaseError("Risposta login Supabase incompleta.")
+        self.save_session()
+
+    def _request(
+        self,
+        method: str,
+        path: str,
+        payload: object | None = None,
+        auth: bool = True,
+        prefer: str | None = None,
+        expect_json: bool = True,
+    ):
+        body = None
+        headers = {
+            "apikey": self.anon_key,
+            "Content-Type": "application/json",
+        }
+        if auth and self.access_token:
+            headers["Authorization"] = f"Bearer {self.access_token}"
+        if prefer:
+            headers["Prefer"] = prefer
+        if payload is not None:
+            body = json.dumps(payload).encode("utf-8")
+
+        request = urllib.request.Request(
+            self.url + path,
+            data=body,
+            headers=headers,
+            method=method,
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=20) as response:
+                raw = response.read().decode("utf-8")
+        except urllib.error.HTTPError as error:
+            detail = error.read().decode("utf-8", errors="replace")
+            raise SupabaseError(f"Supabase HTTP {error.code}: {detail}") from error
+        except urllib.error.URLError as error:
+            raise SupabaseError(f"Supabase non raggiungibile: {error.reason}") from error
+
+        if not expect_json or not raw.strip():
+            return None
+        return json.loads(raw)
 
 
 def normalize_answer(value: str) -> str:
@@ -82,6 +288,10 @@ def load_questions() -> list[Question]:
     return questions
 
 
+def load_questions_from_workbook() -> list[Question]:
+    return load_questions()
+
+
 def load_stats() -> dict:
     if not STATS_PATH.exists():
         return {"questions": {}}
@@ -99,6 +309,20 @@ def question_stats(stats: dict, qid: str) -> dict:
     return stats.setdefault("questions", {}).setdefault(
         qid, {"seen": 0, "correct": 0, "wrong": 0}
     )
+
+
+def merge_stats(local_stats: dict, remote_stats: dict) -> dict:
+    merged = {"questions": {}}
+    all_qids = set(local_stats.get("questions", {})) | set(remote_stats.get("questions", {}))
+    for qid in all_qids:
+        local = question_stats(local_stats, qid)
+        remote = question_stats(remote_stats, qid)
+        merged["questions"][qid] = {
+            "seen": max(int(local.get("seen", 0)), int(remote.get("seen", 0))),
+            "correct": max(int(local.get("correct", 0)), int(remote.get("correct", 0))),
+            "wrong": max(int(local.get("wrong", 0)), int(remote.get("wrong", 0))),
+        }
+    return merged
 
 
 def eligible_questions(candidates: list[Question], stats: dict) -> list[Question]:
@@ -130,7 +354,8 @@ class ExamTrainer(tk.Tk):
         self.geometry("1000x760")
         self.minsize(820, 620)
 
-        self.questions = load_questions()
+        self.sync = SupabaseClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+        self.questions = load_questions_from_workbook()
         if len(self.questions) < SESSION_SIZE:
             messagebox.showwarning(
                 "Domande insufficienti",
@@ -146,6 +371,7 @@ class ExamTrainer(tk.Tk):
         self.correct_in_session = 0
 
         self._build_ui()
+        self.restore_saved_supabase_session()
         self.new_session()
 
     def _build_ui(self) -> None:
@@ -158,6 +384,14 @@ class ExamTrainer(tk.Tk):
         ttk.Button(top, text="Nuovo esame", command=self.confirm_new_session).pack(side="right")
         ttk.Button(top, text="Statistiche", command=self.show_stats).pack(side="right", padx=(0, 8))
         ttk.Button(top, text="Reset counter", command=self.reset_counters).pack(side="right", padx=(0, 8))
+        ttk.Button(top, text="Sync", command=self.sync_now).pack(side="right", padx=(0, 8))
+        ttk.Button(top, text="Logout", command=self.logout).pack(side="right", padx=(0, 8))
+        ttk.Button(top, text="Login", command=self.login).pack(side="right", padx=(0, 8))
+
+        sync_row = ttk.Frame(self, padding=(12, 0, 12, 8))
+        sync_row.pack(fill="x")
+        self.sync_status_label = ttk.Label(sync_row, text="Sync: offline")
+        self.sync_status_label.pack(side="left")
 
         body = ttk.Frame(self, padding=(12, 0, 12, 12))
         body.pack(fill="both", expand=True)
@@ -180,6 +414,121 @@ class ExamTrainer(tk.Tk):
         self.submit_button.pack(side="left")
         self.next_button = ttk.Button(bottom, text="Prossima domanda", command=self.next_question)
         self.next_button.pack(side="left", padx=(8, 0))
+
+    def restore_saved_supabase_session(self) -> None:
+        if not self.sync.load_saved_session():
+            self.update_sync_status("offline")
+            return
+        try:
+            self.sync.refresh_session()
+            self.sync_now(show_success=False)
+        except SupabaseError:
+            self.sync.clear_session()
+            self.update_sync_status("offline")
+
+    def login(self) -> None:
+        credentials = self.ask_credentials()
+        if credentials is None:
+            return
+        email, password = credentials
+        try:
+            self.sync.sign_in(email, password)
+            self.sync_now(show_success=False)
+        except SupabaseError as error:
+            messagebox.showerror("Login Supabase", str(error))
+            self.update_sync_status("offline")
+            return
+        messagebox.showinfo("Login Supabase", f"Login effettuato: {self.sync.email}")
+        self.new_session()
+
+    def logout(self) -> None:
+        if not self.sync.online:
+            self.sync.clear_session()
+            self.update_sync_status("offline")
+            return
+        if not messagebox.askyesno("Logout", "Vuoi scollegare questo trainer da Supabase?"):
+            return
+        self.sync.clear_session()
+        self.update_sync_status("offline")
+
+    def sync_now(self, show_success: bool = True) -> None:
+        if not self.sync.online:
+            messagebox.showwarning("Sync", "Fai login a Supabase prima di sincronizzare.")
+            return
+        try:
+            remote_questions = self.sync.fetch_questions()
+            remote_stats = self.sync.fetch_stats()
+        except SupabaseError as error:
+            self.update_sync_status("offline, ultimo sync fallito")
+            if show_success:
+                messagebox.showerror("Sync", str(error))
+            return
+
+        if remote_questions:
+            self.questions = remote_questions
+        self.stats = merge_stats(self.stats, remote_stats)
+        save_stats(self.stats)
+        try:
+            self.sync.upsert_stats(self.stats.get("questions", {}))
+        except SupabaseError as error:
+            self.update_sync_status("online, upload stats fallito")
+            if show_success:
+                messagebox.showerror("Sync", str(error))
+            return
+        self.update_sync_status(f"online: {self.sync.email}")
+        if show_success:
+            messagebox.showinfo("Sync", "Statistiche sincronizzate con Supabase.")
+
+    def sync_question_stat(self, qid: str) -> None:
+        if not self.sync.online:
+            return
+        try:
+            self.sync.upsert_stat(qid, question_stats(self.stats, qid))
+            self.update_sync_status(f"online: {self.sync.email}")
+        except SupabaseError:
+            self.update_sync_status("offline, sync in sospeso")
+
+    def update_sync_status(self, value: str) -> None:
+        self.sync_status_label.configure(text=f"Sync: {value}")
+
+    def ask_credentials(self) -> tuple[str, str] | None:
+        dialog = tk.Toplevel(self)
+        dialog.title("Login Supabase")
+        dialog.transient(self)
+        dialog.grab_set()
+        dialog.resizable(False, False)
+
+        frame = ttk.Frame(dialog, padding=16)
+        frame.pack(fill="both", expand=True)
+
+        ttk.Label(frame, text="Email").grid(row=0, column=0, sticky="w")
+        email_var = tk.StringVar(value=self.sync.email)
+        email_entry = ttk.Entry(frame, textvariable=email_var, width=42)
+        email_entry.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(4, 10))
+
+        ttk.Label(frame, text="Password").grid(row=2, column=0, sticky="w")
+        password_var = tk.StringVar()
+        password_entry = ttk.Entry(frame, textvariable=password_var, show="*", width=42)
+        password_entry.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(4, 14))
+
+        result: dict[str, tuple[str, str] | None] = {"value": None}
+
+        def submit() -> None:
+            email = email_var.get().strip()
+            password = password_var.get()
+            if not email or not password:
+                messagebox.showwarning("Login Supabase", "Inserisci email e password.", parent=dialog)
+                return
+            result["value"] = (email, password)
+            dialog.destroy()
+
+        ttk.Button(frame, text="Annulla", command=dialog.destroy).grid(row=4, column=0, sticky="e")
+        ttk.Button(frame, text="Login", command=submit).grid(row=4, column=1, sticky="e", padx=(8, 0))
+
+        dialog.bind("<Return>", lambda _event: submit())
+        email_entry.focus_set()
+        self.wait_window(dialog)
+        return result["value"]
 
     def confirm_new_session(self) -> None:
         if messagebox.askyesno("Nuovo esame", "Vuoi iniziare una nuova sessione da 65 domande?"):
@@ -207,6 +556,7 @@ class ExamTrainer(tk.Tk):
             question_stats(self.stats, question.qid)["seen"] += 1
             break
         save_stats(self.stats)
+        self.sync_question_stat(question.qid)
 
         self.current_options = self.shuffle_options(question)
 
@@ -278,6 +628,7 @@ class ExamTrainer(tk.Tk):
         else:
             stats["wrong"] += 1
         save_stats(self.stats)
+        self.sync_question_stat(question.qid)
 
         selected_text = self.describe_letters(selected)
         correct_text = self.describe_letters(question.correct_letters)
@@ -329,6 +680,7 @@ class ExamTrainer(tk.Tk):
                 f"Estrazioni totali: {total_seen}\n"
                 f"Risposte corrette: {total_correct}\n"
                 f"Risposte sbagliate: {total_wrong}\n"
+                f"Sync: {'online' if self.sync.online else 'offline'}\n"
                 f"File statistiche: {STATS_PATH.name}"
             ),
         )
@@ -341,6 +693,21 @@ class ExamTrainer(tk.Tk):
             return
         self.stats = {"questions": {}}
         save_stats(self.stats)
+        if self.sync.online:
+            zero_stats = {
+                question.qid: {"seen": 0, "correct": 0, "wrong": 0}
+                for question in self.questions
+            }
+            try:
+                self.sync.upsert_stats(zero_stats)
+            except SupabaseError as error:
+                messagebox.showwarning(
+                    "Reset counter",
+                    f"Reset locale completato, ma reset Supabase non riuscito:\n{error}",
+                )
+                self.update_sync_status("offline, reset remoto fallito")
+                self.new_session()
+                return
         messagebox.showinfo("Reset counter", "Statistiche azzerate.")
         self.new_session()
 
