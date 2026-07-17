@@ -180,6 +180,23 @@ class SupabaseClient:
             expect_json=False,
         )
 
+    def update_question(self, question: Question) -> None:
+        payload = {
+            "prompt": question.prompt,
+            "options": [
+                {"letter": letter, "text": text}
+                for letter, text in question.options
+            ],
+            "correct_letters": sorted(question.correct_letters),
+        }
+        self._request(
+            "PATCH",
+            "/rest/v1/questions?" + urllib.parse.urlencode({"id": f"eq.{question.qid}"}),
+            payload=payload,
+            prefer="return=minimal",
+            expect_json=False,
+        )
+
     def _apply_auth_response(self, data: dict) -> None:
         user = data.get("user") or {}
         self.access_token = data.get("access_token", "")
@@ -382,6 +399,7 @@ class ExamTrainer(tk.Tk):
         self.progress_label.pack(side="left")
 
         ttk.Button(top, text="Nuovo esame", command=self.confirm_new_session).pack(side="right")
+        ttk.Button(top, text="Modifica domanda", command=self.edit_current_question).pack(side="right", padx=(0, 8))
         ttk.Button(top, text="Statistiche", command=self.show_stats).pack(side="right", padx=(0, 8))
         ttk.Button(top, text="Reset counter", command=self.reset_counters).pack(side="right", padx=(0, 8))
         ttk.Button(top, text="Sync", command=self.sync_now).pack(side="right", padx=(0, 8))
@@ -530,6 +548,102 @@ class ExamTrainer(tk.Tk):
         self.wait_window(dialog)
         return result["value"]
 
+    def edit_current_question(self) -> None:
+        if self.index >= len(self.session):
+            messagebox.showwarning("Modifica domanda", "Non c'è una domanda attiva da modificare.")
+            return
+        if not self.sync.online:
+            messagebox.showwarning("Modifica domanda", "Fai login a Supabase per salvare le modifiche nel database.")
+            return
+
+        question = self.session[self.index]
+        dialog = tk.Toplevel(self)
+        dialog.title(f"Modifica domanda {question.qid}")
+        dialog.transient(self)
+        dialog.grab_set()
+        dialog.geometry("760x680")
+        dialog.minsize(620, 520)
+
+        frame = ttk.Frame(dialog, padding=16)
+        frame.pack(fill="both", expand=True)
+        ttk.Label(frame, text="Testo della domanda").pack(anchor="w")
+        prompt_editor = tk.Text(frame, wrap="word", height=8, font=("Segoe UI", 10))
+        prompt_editor.insert("1.0", question.prompt)
+        prompt_editor.pack(fill="x", pady=(4, 12))
+
+        ttk.Label(frame, text="Risposte (seleziona quelle corrette)").pack(anchor="w")
+        option_area = ttk.Frame(frame)
+        option_area.pack(fill="both", expand=True, pady=(4, 10))
+        option_entries: list[tuple[str, ttk.Entry]] = []
+        correct_vars: dict[str, tk.BooleanVar] = {}
+        for row, (letter, text) in enumerate(question.options):
+            var = tk.BooleanVar(value=letter in question.correct_letters)
+            correct_vars[letter] = var
+            ttk.Checkbutton(option_area, text=letter, variable=var).grid(row=row, column=0, sticky="nw", padx=(0, 8), pady=4)
+            entry = ttk.Entry(option_area)
+            entry.insert(0, text)
+            entry.grid(row=row, column=1, sticky="ew", pady=4)
+            option_entries.append((letter, entry))
+        option_area.columnconfigure(1, weight=1)
+
+        count_var = tk.IntVar(value=len(question.correct_letters))
+        count_row = ttk.Frame(frame)
+        count_row.pack(fill="x", pady=(0, 12))
+        ttk.Label(count_row, text="Numero di risposte corrette").pack(side="left")
+        ttk.Spinbox(
+            count_row,
+            from_=1,
+            to=len(question.options),
+            width=5,
+            textvariable=count_var,
+        ).pack(side="left", padx=(8, 0))
+
+        buttons = ttk.Frame(frame)
+        buttons.pack(fill="x")
+
+        def save() -> None:
+            prompt = prompt_editor.get("1.0", "end").strip()
+            options = [(letter, entry.get().strip()) for letter, entry in option_entries]
+            correct = {letter for letter, var in correct_vars.items() if var.get()}
+            try:
+                expected_count = int(count_var.get())
+            except (tk.TclError, ValueError):
+                expected_count = 0
+            if not prompt:
+                messagebox.showwarning("Modifica domanda", "Il testo della domanda non può essere vuoto.", parent=dialog)
+                return
+            if any(not text for _, text in options):
+                messagebox.showwarning("Modifica domanda", "Il testo di ogni risposta è obbligatorio.", parent=dialog)
+                return
+            if expected_count < 1 or expected_count > len(options):
+                messagebox.showwarning("Modifica domanda", "Il numero di risposte corrette non è valido.", parent=dialog)
+                return
+            if len(correct) != expected_count:
+                messagebox.showwarning(
+                    "Modifica domanda",
+                    f"Hai indicato {expected_count} risposte corrette, ma ne hai selezionate {len(correct)}.",
+                    parent=dialog,
+                )
+                return
+
+            updated = Question(question.qid, question.source, question.original_num, prompt, options, correct)
+            try:
+                self.sync.update_question(updated)
+            except SupabaseError as error:
+                messagebox.showerror("Modifica domanda", str(error), parent=dialog)
+                return
+
+            question.prompt = updated.prompt
+            question.options = updated.options
+            question.correct_letters = updated.correct_letters
+            dialog.destroy()
+            self.show_question(count_seen=False)
+            messagebox.showinfo("Modifica domanda", "Domanda aggiornata nel database.")
+
+        ttk.Button(buttons, text="Annulla", command=dialog.destroy).pack(side="right")
+        ttk.Button(buttons, text="Salva nel database", command=save).pack(side="right", padx=(0, 8))
+        prompt_editor.focus_set()
+
     def confirm_new_session(self) -> None:
         if messagebox.askyesno("Nuovo esame", "Vuoi iniziare una nuova sessione da 65 domande?"):
             self.new_session()
@@ -540,7 +654,7 @@ class ExamTrainer(tk.Tk):
         self.correct_in_session = 0
         self.show_question()
 
-    def show_question(self) -> None:
+    def show_question(self, count_seen: bool = True) -> None:
         self.feedback_shown = False
         self.answer_vars.clear()
         self.option_widgets.clear()
@@ -552,11 +666,10 @@ class ExamTrainer(tk.Tk):
             return
 
         question = self.session[self.index]
-        for option in question.options:
+        if count_seen:
             question_stats(self.stats, question.qid)["seen"] += 1
-            break
-        save_stats(self.stats)
-        self.sync_question_stat(question.qid)
+            save_stats(self.stats)
+            self.sync_question_stat(question.qid)
 
         self.current_options = self.shuffle_options(question)
 

@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +74,7 @@ public class MainActivity extends Activity {
     private int index = 0;
     private int correctInSession = 0;
     private boolean feedbackShown = false;
+    private boolean fullSyncInProgress = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +134,7 @@ public class MainActivity extends Activity {
         addHeaderButton(actionRow, "Sync", v -> syncNow(true));
         addHeaderButton(actionRow, "Stats", v -> showStats());
         addHeaderButton(actionRow, "Reset", v -> confirmReset());
+        addHeaderButton(actionRow, "Modifica", v -> showQuestionEditor());
         addHeaderButton(actionRow, "Nuovo", v -> confirmNewSession());
 
         ScrollView scrollView = new ScrollView(this);
@@ -307,6 +310,10 @@ public class MainActivity extends Activity {
     }
 
     private void showQuestion() {
+        showQuestion(true);
+    }
+
+    private void showQuestion(boolean countSeen) {
         feedbackShown = false;
         checkBoxes.clear();
         currentOptions.clear();
@@ -324,8 +331,10 @@ public class MainActivity extends Activity {
         }
 
         Question question = session.get(index);
-        increment(question.id, "seen");
-        syncQuestionStat(question.id);
+        if (countSeen) {
+            increment(question.id, "seen");
+            syncQuestionStat(question.id);
+        }
         shuffleOptions(question);
 
         progressView.setText(
@@ -444,6 +453,159 @@ public class MainActivity extends Activity {
         showQuestion();
     }
 
+    private void showQuestionEditor() {
+        if (index >= session.size()) {
+            toast("Non c'è una domanda attiva da modificare.");
+            return;
+        }
+        if (!isOnline()) {
+            toast("Fai login a Supabase per modificare il database.");
+            showLoginDialog();
+            return;
+        }
+
+        Question question = session.get(index);
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+        form.setPadding(dp(20), dp(8), dp(20), dp(8));
+
+        TextView promptLabel = new TextView(this);
+        promptLabel.setText("Testo della domanda");
+        promptLabel.setTextColor(INK);
+        form.addView(promptLabel);
+
+        EditText promptEditor = new EditText(this);
+        promptEditor.setText(question.prompt);
+        promptEditor.setGravity(Gravity.TOP);
+        promptEditor.setMinLines(4);
+        promptEditor.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+        form.addView(promptEditor, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView answersLabel = new TextView(this);
+        answersLabel.setText("Risposte (seleziona quelle corrette)");
+        answersLabel.setTextColor(INK);
+        answersLabel.setPadding(0, dp(12), 0, dp(4));
+        form.addView(answersLabel);
+
+        List<EditText> optionEditors = new ArrayList<>();
+        List<CheckBox> correctEditors = new ArrayList<>();
+        for (Option option : question.options) {
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+
+            CheckBox correct = new CheckBox(this);
+            correct.setText(option.letter);
+            correct.setChecked(question.correctLetters.contains(option.letter));
+            row.addView(correct, new LinearLayout.LayoutParams(dp(64), ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            EditText answer = new EditText(this);
+            answer.setText(option.text);
+            answer.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            row.addView(answer, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+            form.addView(row);
+            correctEditors.add(correct);
+            optionEditors.add(answer);
+        }
+
+        EditText correctCount = new EditText(this);
+        correctCount.setHint("Numero di risposte corrette");
+        correctCount.setText(String.valueOf(question.correctLetters.size()));
+        correctCount.setInputType(InputType.TYPE_CLASS_NUMBER);
+        form.addView(correctCount);
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(form);
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Modifica domanda " + question.id)
+                .setView(scroll)
+                .setPositiveButton("Salva nel database", null)
+                .setNegativeButton("Annulla", null)
+                .create();
+        dialog.setOnShowListener(ignored -> dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String prompt = promptEditor.getText().toString().trim();
+            int expectedCount;
+            try {
+                expectedCount = Integer.parseInt(correctCount.getText().toString().trim());
+            } catch (NumberFormatException error) {
+                expectedCount = 0;
+            }
+            List<Option> updatedOptions = new ArrayList<>();
+            Set<String> updatedCorrect = new HashSet<>();
+            for (int i = 0; i < question.options.size(); i++) {
+                String answerText = optionEditors.get(i).getText().toString().trim();
+                if (answerText.isEmpty()) {
+                    optionEditors.get(i).setError("Testo obbligatorio");
+                    return;
+                }
+                Option option = new Option();
+                option.letter = question.options.get(i).letter;
+                option.text = answerText;
+                updatedOptions.add(option);
+                if (correctEditors.get(i).isChecked()) {
+                    updatedCorrect.add(option.letter);
+                }
+            }
+            if (prompt.isEmpty()) {
+                promptEditor.setError("Testo obbligatorio");
+                return;
+            }
+            if (expectedCount < 1 || expectedCount > updatedOptions.size()) {
+                correctCount.setError("Numero non valido");
+                return;
+            }
+            if (updatedCorrect.size() != expectedCount) {
+                correctCount.setError("Indicate " + expectedCount + ", selezionate " + updatedCorrect.size());
+                return;
+            }
+
+            Question updated = new Question();
+            updated.id = question.id;
+            updated.source = question.source;
+            updated.originalNumber = question.originalNumber;
+            updated.prompt = prompt;
+            updated.options.addAll(updatedOptions);
+            updated.correctLetters.addAll(updatedCorrect);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            runNetwork(null, () -> {
+                updateQuestion(updated);
+                runOnUiThread(() -> {
+                    question.prompt = updated.prompt;
+                    question.options.clear();
+                    question.options.addAll(updated.options);
+                    question.correctLetters.clear();
+                    question.correctLetters.addAll(updated.correctLetters);
+                    dialog.dismiss();
+                    showQuestion(false);
+                    toast("Domanda aggiornata nel database.");
+                });
+            });
+        }));
+        dialog.show();
+    }
+
+    private void updateQuestion(Question question) throws Exception {
+        JSONObject payload = new JSONObject();
+        payload.put("prompt", question.prompt);
+        JSONArray options = new JSONArray();
+        for (Option option : question.options) {
+            JSONObject item = new JSONObject();
+            item.put("letter", option.letter);
+            item.put("text", option.text);
+            options.put(item);
+        }
+        payload.put("options", options);
+        payload.put("correct_letters", new JSONArray(question.correctLetters));
+        requestRaw(
+                "PATCH",
+                "/rest/v1/questions?id=eq." + URLEncoder.encode(question.id, StandardCharsets.UTF_8.name()),
+                payload,
+                true,
+                "return=minimal"
+        );
+    }
+
     private void showLoginDialog() {
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
@@ -475,6 +637,10 @@ public class MainActivity extends Activity {
             toast("Inserisci email e password.");
             return;
         }
+        if (fullSyncInProgress) {
+            toast("Attendi il termine della sincronizzazione in corso.");
+            return;
+        }
         runNetwork("Login...", () -> {
             JSONObject payload = new JSONObject();
             payload.put("email", email);
@@ -491,22 +657,52 @@ public class MainActivity extends Activity {
     }
 
     private void refreshAndSync(boolean showSuccess) {
-        runNetwork(null, () -> {
-            if (!refreshToken.isEmpty()) {
-                JSONObject payload = new JSONObject();
-                payload.put("refresh_token", refreshToken);
-                JSONObject response = requestJson("POST", "/auth/v1/token?grant_type=refresh_token", payload, false, null);
-                applyAuthResponse(response);
+        if (fullSyncInProgress) {
+            if (showSuccess) {
+                toast("Sincronizzazione già in corso.");
             }
-            fetchRemoteAndMerge();
-            runOnUiThread(() -> {
-                updateSyncStatus();
-                if (showSuccess) {
-                    toast("Sync completato.");
+            return;
+        }
+        fullSyncInProgress = true;
+        new Thread(() -> {
+            try {
+                if (!refreshToken.isEmpty()) {
+                    JSONObject payload = new JSONObject();
+                    payload.put("refresh_token", refreshToken);
+                    JSONObject response = requestJson("POST", "/auth/v1/token?grant_type=refresh_token", payload, false, null);
+                    applyAuthResponse(response);
                 }
-                newSession();
-            });
-        });
+                fetchRemoteAndMerge();
+                runOnUiThread(() -> {
+                    fullSyncInProgress = false;
+                    updateSyncStatus();
+                    if (showSuccess) {
+                        toast("Sync completato.");
+                    }
+                    newSession();
+                });
+            } catch (Exception error) {
+                String message = error.getMessage() == null ? "Errore sconosciuto." : error.getMessage();
+                boolean invalidRefreshToken = message.contains("refresh_token_already_used")
+                        || message.contains("Invalid Refresh Token")
+                        || message.contains("refresh_token_not_found");
+                if (invalidRefreshToken) {
+                    clearAuthSession();
+                }
+                runOnUiThread(() -> {
+                    fullSyncInProgress = false;
+                    updateSyncStatus();
+                    if (invalidRefreshToken) {
+                        showMessage(
+                                "Sessione scaduta",
+                                "Il token di accesso non è più valido. Premi Login ed effettua nuovamente l'accesso; le statistiche locali non verranno perse."
+                        );
+                    } else {
+                        showMessage("Sync", message);
+                    }
+                });
+            }
+        }).start();
     }
 
     private void syncNow(boolean showSuccess) {
@@ -613,6 +809,19 @@ public class MainActivity extends Activity {
         refreshToken = prefs.getString("auth_refresh_token", "");
         userId = prefs.getString("auth_user_id", "");
         userEmail = prefs.getString("auth_email", "");
+    }
+
+    private void clearAuthSession() {
+        accessToken = "";
+        refreshToken = "";
+        userId = "";
+        userEmail = "";
+        prefs.edit()
+                .remove("auth_access_token")
+                .remove("auth_refresh_token")
+                .remove("auth_user_id")
+                .remove("auth_email")
+                .apply();
     }
 
     private boolean isOnline() {

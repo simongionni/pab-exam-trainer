@@ -53,6 +53,10 @@ The Android app uses the same questions and the same training logic:
 - Immediate feedback after each question.
 - Selection limited to the number of correct answers.
 - Local resettable counters on the phone.
+- Editing the current question, answer texts, number of correct answers, and which answers are correct.
+
+Question edits require a Supabase login and are written directly to the shared `questions` table. Apply the
+Supabase migrations before using the editor so authenticated users have permission to update question content.
 
 To refresh the app question bank after changing `pab-s1-quiz.xlsx`, run:
 
